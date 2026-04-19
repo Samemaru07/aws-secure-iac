@@ -1,0 +1,9 @@
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfvars.json
+ansible/inventory/hosts.yml
+*.retry
+.DS_Store
+*.swp
