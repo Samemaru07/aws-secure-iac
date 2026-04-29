@@ -1,0 +1,18 @@
+- name: "Install Nginx"
+  ansible.builtin.apt:
+      name: "nginx"
+      state: "present"
+
+- name: "Start and enable nginx service"
+  ansible.builtin.systemd: # systemdを操作する道具
+      name: "nginx"
+      state: "started" # 「今すぐ実行中であること」を保証する。
+      enabled: true # 「OSが起動した時に自動で立ち上がる設定」を有効に。
+
+- name: "Copy custom index.html"
+  ansible.builtin.copy:
+      src: "index.html" #`files/`ディレクトリ内にあるファイル名を指定 (自動的にfiles/を探す)
+      dest: "/var/www/html/index.html" # サーバ上の配置先パス
+      owner: "www-data"
+      group: "www-data"
+      mode: "0644"
