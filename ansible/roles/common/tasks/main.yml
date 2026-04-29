@@ -1,0 +1,94 @@
+- name: "Update apt cache and upgrade all packages"
+
+  # FQCN どの道具箱から道具を取り出すか。
+  # `ansible`: 開発元, `builtin`: Ansible本体に最初から内蔵されている、最も信頼性の高い標準ツール群
+  ansible.builtin.apt:
+      upgrade: "dist" # OSに入っている既存のパッケージを安全に更新する。依存関係も含めて、OS全体を最新の状態の最適化する `apt dist-upgrade`相当。初期構築痔はこれを使うのが一般的。
+      update_cache: true # インストール前にパッケージ情報を最新に更新する。`apt update` を行う。
+
+- name: "Install basic packages"
+  ansible.builtin.apt:
+      name:
+          - "curl"
+          - "git"
+          - "vim"
+          - "ufw"
+      state: "present" # そのパッケージを最終的にどうしたいか (べき等性)。 インストールされていることをゴールにする。`absent`: アンインストールされていることをゴールに、`latest`: 常に最新版が入っていることをゴールにする。
+
+- name: "Set timezone to Asia/Tokyo"
+  ansible.builtin.timezone:
+      name: Asia/Tokyo
+
+# UFW (Cncomplicated Firewall)
+# SSH (22), HTTP (80) をOpen
+- name: "Allow SSH traffic"
+  ansible.builtin.ufw:
+      rule: "allow" # 指定した通信を許可
+      port: "22"
+      proto: "tcp"
+
+- name: "Allow HTTP traffic"
+  ansible.builtin.ufw:
+      rule: "allow"
+      port: "80"
+      proto: "tcp"
+
+- name: "Enabled UFW and set default deny policy"
+  ansible.builtin.ufw:
+      state: "enabled" # ファイアウォール機能を有効化し、OS起動時にも自動適用されるようにする。
+      policy: "deny" # 「デフォルト拒否」の設定。ルールに書かれていない未知の通信はこのポリシーによって遮断。
+      direction: "incoming" # 外部からサーバへ「入ってくる」通信に対し、制限をかける。
+
+# ユーザ作成と権限管理
+- name: "Create a management user"
+  ansible.builtin.user:
+      name: "samemaru"
+      groups: "sudo" # Debian系OSでは`sudo`グループに属することで管理者権限の行使が可能になる。
+      shell: "/bin/bash" # ログイン時に起動するシェルプログラムを指定する。
+      append: true # 既存のグループを維持したまま、`sudo`グループに追加する。
+
+# 公開鍵の登録
+- name: "Set authorized key for the user"
+  ansible.builtin.authorized_key:
+      user: "samemaru" # 公開鍵を登録する対象のユーザを指定。
+      state: "present" # 公開鍵が存在すること。
+      key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}" # ローカルマシンの公開鍵ファイルを読み込み、その内容をサーバに転送する。
+
+# 特権昇格の自動化
+# Ansibleなどの自動化ツールが、対話的なパスワード入力を待たずに管理者コマンドを実行できるようにする。
+- name: "Allow passwordless sudo for samemaru"
+  ansible.builtin.lineinfile:
+      path: "/etc/sudoers.d/samemaru" # sudoの個別設定を保存するパス。
+      line: "samemaru ALL=(ALL) NOPASSWD:ALL" # 全てのホストから全てのユーザとして、パスワードなしで全てのコマンドを実行可能にする。
+      create: true # 指定したファイルが存在しない場合は新規作成。
+      mode: "0440" # 設定ファイルの権限を、所有者とグループのみ読み取り専用にする。
+      validate: "visudo -cf %s" # 設定を保存する直前に、`visudo`コマンドで構文チェックを行う。
+
+# SSHデーモンの設定変更
+- name: "Disable password authentication"
+  ansible.builtin.lineinfile:
+      path: "/etc/ssh/sshd_config"
+      regexp: "^#?passwordAuthentication" # `PasswordAuthentication`で始まる行、またはコメンツアウトされている行を正規表現で探す。
+      line: "PasswordAuthentication no" # 探し出した行を、パスワード認証を拒否する設定値に書き換える。
+  notify: "Restart ssh" # SSHサービスを再起動。
+
+# Rootログインの拒否
+- name: "Disable root login"
+  ansible.builtin.lineinfile:
+      path: "/etc/ssh/sshd_config"
+      regexp: "^#?PermitRootLogin" # rootユーザのログイン許可に関する設定行を探し出す。
+      line: "PermitRootLogin no" # rootでの直接ログインを完全に禁止。
+  notify: "Restart ssh"
+
+- name: "Disable login for the default user"
+  ansible.builtin.user:
+      name: "ubuntu"
+      shell: "/usr/sbin/nologin" # ユーザのログインシェルを、ログインを拒否する専用のプログラムに書き換え。
+      password_lock: true # `/etc/shadow`内のパスワードハッシュを無効化する。パスワード認証が試行されること自体を物理的に防ぐ。
+
+- name: "Restrict SSH access to specific users"
+  ansible.builtin.lineinfile:
+      path: "/etc/ssh/sshd_config"
+      line: "AllowUsers samemaru" # ホワイトリスト方式で、明示したユーザ以外のログイン試行を全てドロップする。
+      insertafter: "EOF" # ファイルの末尾に挿入
+  notify: "Restart ssh"

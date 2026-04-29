@@ -1,0 +1,6 @@
+- name: "Apply common configuration to all nodes"
+  hosts: "all"
+  become: true # 管理者権限で実行せよ という命令
+  roles:
+      - "common"
+      - "nginx"
