@@ -9,6 +9,26 @@
       state: "started" # 「今すぐ実行中であること」を保証する。
       enabled: true # 「OSが起動した時に自動で立ち上がる設定」を有効に。
 
+- name: "Install Nginx"
+  ansible.builtin.apt:
+        name: "nginx"
+        state: "present"
+
+- name: "Apply Nginx configuration from template"
+  ansible.builtin.template:
+      src: "default.conf.j2"
+      dest: "/etc/nginx/sites-available/default"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+  notify: "Reload Nginx"
+
+- name: "Start and enable nginx service"
+  ansible.builtin.systemd:
+      name: "nginx"
+      state: "started"
+      enabled: true
+
 - name: "Copy custom index.html"
   ansible.builtin.copy:
       src: "index.html" #`files/`ディレクトリ内にあるファイル名を指定 (自動的にfiles/を探す)
