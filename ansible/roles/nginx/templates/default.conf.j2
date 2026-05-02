@@ -1,0 +1,36 @@
+server {
+    listen 80;  # 80番 (HTTP) で来た人は...
+    server_name {{ main_domain }} {{ test_domain }};
+
+    # Certbotが認証ファイルを起く場所。ここは常にHTTPでアクセス可能にする。
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        {% if cert_stat.stat.exists %}
+        # 証明書があるなら、安全なHTTPSへリダイレクトする。
+        return 301 https://$host$request_uri;
+        {% else %}
+        # 証明書がない間 (初回構築時) は、HTTPのままHTMLを表示する。
+        root /var/www/html;
+        index index.html;
+        {% endif %}
+    }
+}
+
+# 証明書ファイルが存在する場合のみ、443番の設定を出力する。
+{% if cert_stat.stat.exists %}
+server {
+    listen 443 ssl;
+    server_name {{ main_domain }} {{ test_domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ main_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ main_domain }}/privkey.pem;
+
+    location / {
+        root /var/www/html;
+        index index.html
+    }
+}
+{% endif %}

@@ -1,14 +1,33 @@
-- name: "Install Nginx"
+---
+# 1. 必要なもののインストール
+- name: "Install Nginx and Certbot"
   ansible.builtin.apt:
-      name: "nginx"
+      name:
+          - "nginx"
+          - "certbot"
+          - "python3-certbot-nginx"
       state: "present"
+      update_cache: true
 
-- name: "Start and enable nginx service"
-  ansible.builtin.systemd: # systemdを操作する道具
-      name: "nginx"
-      state: "started" # 「今すぐ実行中であること」を保証する。
-      enabled: true # 「OSが起動した時に自動で立ち上がる設定」を有効に。
+# 2. テンプレートを使う前に、証明書があるかを確認する。
+# ansible.builtin.stat: 指定したパスが存在するかを確認するモジュール
+# 確認した結果を`cert_stat`という変数に保存。
+- name: "Check if certificate already exists"
+  ansible.builtin.stat: # ファイル調査員
+      path: "/etc/letsencrypt/live/{{ main_domain }}/fullchain.pem"
+  register: cert_stat
 
+# 3. Nginxの設定ファイルを配置 (初回はHTTPのみの設定となる) 。
+- name: "Apply Nginx configuration from template"
+  ansible.builtin.template:
+      src: "default.conf.j2"
+      dest: "/etc/nginx/sites-available/default"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+  notify: "Reload Nginx"
+
+# 4. コンテンツやサービスの状態を整える。
 - name: "Copy custom index.html"
   ansible.builtin.copy:
       src: "index.html" #`files/`ディレクトリ内にあるファイル名を指定 (自動的にfiles/を探す)
@@ -16,3 +35,44 @@
       owner: "www-data"
       group: "www-data"
       mode: "0644"
+
+- name: "Start and enable nginx service"
+  ansible.builtin.systemd: # systemdを操作する道具
+      name: "nginx"
+      state: "started" # 「今すぐ実行中であること」を保証する。
+      enabled: true # 「OSが起動した時に自動で立ち上がる設定」を有効に。
+
+# 5. ここで一度Reloadを実行させて、NginxをHTTPで立ち上げる。
+- name: "Flush handlers to start Nginx"
+  ansible.builtin.meta: flush_handlers
+
+# 6. 証明書がなければ取得する。
+# ansible.builtin.command: サーバ上で直接コマンドを実行するモジュール
+# `--nginx`: Nginxの設定を自動で読み取り、SSLの設定も勝手にしてくれる。
+# `-d`: 証明書を取得するドメインを指定。
+# `--non-interactive`: 途中で「はい/いいえ」を聞かれないようにする。
+# `--agree-tos`: 利用規約に同意する。
+# `when`で、「もし証明書がまだ存在しない場合だけ、このコマンドを実行する。
+- name: "Issue SSL certificate using Certbot"
+  ansible.builtin.command:
+      # --stagingで、テスト用の証明書を発行する。
+      cmd: "certbot certonly --nginx -d  {{ main_domain }} -d {{ test_domain }} --non-interactive --agree-tos -m {{ certbot_admin_email }} --staging"
+  when: "not cert_stat.stat.exists"
+
+# 証明書ができたはずなので、調査員 (stat) を再度送り込む。
+- name: "Update certificate status after issuance"
+  ansible.builtin.stat:
+      path: "/etc/letsencrypt/live/{{ main_domain }}/fullchain.pem"
+  register: "cert_stat"
+
+# 7. 証明書が取れたら、もう一度テンプレートを適用 (今度はHTTPS設定が書き込まれる) 。
+- name: "Re-deploy Nginx configuration with SSL"
+  ansible.builtin.template: # 賢い翻訳家。変数を実際の値に置き換えてからサーバに配置する。
+      src: "default.conf.j2"
+      dest: "/etc/nginx/sites-available/default"
+  when: "cert_stat.stat.exists"
+  notify: "Reload Nginx"
+
+# 最後に念の為、全ての設定を反映させる。
+- name: "Flush handlers to ensure Nginx is updated"
+  ansible.builtin.meta: flush_handlers
