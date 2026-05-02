@@ -1,4 +1,5 @@
-- name: "Restart SSH" # タスクのnotifyと完全一致
+---
+- name: "Restart ssh" # タスクのnotifyと完全一致
   ansible.builtin.systemd:
       name: "ssh"
       state: "restarted"

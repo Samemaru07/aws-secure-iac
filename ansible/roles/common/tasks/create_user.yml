@@ -1,0 +1,54 @@
+---
+# ユーザ作成と権限管理
+- name: "Create a management user"
+  ansible.builtin.user:
+      name: "{{ manage_user }}"
+      groups: "sudo" # Debian系OSでは`sudo`グループに属することで管理者権限の行使が可能になる。
+      shell: "/bin/bash" # ログイン時に起動するシェルプログラムを指定する。
+      append: true # 既存のグループを維持したまま、`sudo`グループに追加する。
+
+# 公開鍵の登録
+- name: "Set authorized key for the user"
+  ansible.builtin.authorized_key:
+      user: "{{ manage_user }}" # 公開鍵を登録する対象のユーザを指定。
+      state: "present" # 公開鍵が存在すること。
+      key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}" # ローカルマシンの公開鍵ファイルを読み込み、その内容をサーバに転送する。
+
+# 特権昇格の自動化
+# Ansibleなどの自動化ツールが、対話的なパスワード入力を待たずに管理者コマンドを実行できるようにする。
+- name: "Allow passwordless sudo for {{ manage_user }}"
+  ansible.builtin.lineinfile:
+      path: "/etc/sudoers.d/{{ manage_user }}" # sudoの個別設定を保存するパス。
+      line: "{{ manage_user }} ALL=(ALL) NOPASSWD:ALL" # 全てのホストから全てのユーザとして、パスワードなしで全てのコマンドを実行可能にする。
+      create: true # 指定したファイルが存在しない場合は新規作成。
+      mode: "0440" # 設定ファイルの権限を、所有者とグループのみ読み取り専用にする。
+      validate: "visudo -cf %s" # 設定を保存する直前に、`visudo`コマンドで構文チェックを行う。
+
+# SSHデーモンの設定変更
+- name: "Disable password authentication"
+  ansible.builtin.lineinfile:
+      path: "/etc/ssh/sshd_config"
+      regexp: "^#?passwordAuthentication" # `PasswordAuthentication`で始まる行、またはコメンツアウトされている行を正規表現で探す。
+      line: "PasswordAuthentication no" # 探し出した行を、パスワード認証を拒否する設定値に書き換える。
+  notify: "Restart ssh" # SSHサービスを再起動。
+
+# Rootログインの拒否
+- name: "Disable root login"
+  ansible.builtin.lineinfile:
+      path: "/etc/ssh/sshd_config"
+      regexp: "^#?PermitRootLogin" # rootユーザのログイン許可に関する設定行を探し出す。
+      line: "PermitRootLogin no" # rootでの直接ログインを完全に禁止。
+  notify: "Restart ssh"
+
+- name: "Disable login for the default user"
+  ansible.builtin.user:
+      name: "{{ initial_user }}"
+      shell: "/usr/sbin/nologin" # ユーザのログインシェルを、ログインを拒否する専用のプログラムに書き換え。
+      password_lock: true # `/etc/shadow`内のパスワードハッシュを無効化する。パスワード認証が試行されること自体を物理的に防ぐ。
+
+- name: "Restrict SSH access to specific users"
+  ansible.builtin.lineinfile:
+      path: "/etc/ssh/sshd_config"
+      line: "AllowUsers {{ manage_user }}" # ホワイトリスト方式で、明示したユーザ以外のログイン試行を全てドロップする。
+      insertafter: "EOF" # ファイルの末尾に挿入
+  notify: "Restart ssh"
