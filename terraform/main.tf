@@ -69,6 +69,13 @@ resource "aws_security_group" "ssh_http" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # アウトバウンドルール
   egress {
     # 全てのポートと全てのプロトコルを許可 (全開放)
@@ -100,4 +107,20 @@ resource "aws_instance" "server" {
   tags = {
     Name = "iac-server"
   }
+}
+
+# Ansible用のイベントファイルを自動的に生成する。
+resource "local_file" "ansible_inventory" {
+  filename = "${path.module}/../ansible/inventory/hosts.yml"
+
+  content = <<-EOF
+   ---
+   all:
+       hosts:
+           ec2-instance:
+               ansible_host: "${aws_instance.server.public_ip}"
+               ansible_user: "ubuntu"
+               main_domain: "samemaru.me"
+               test_domain: "iac.samemaru.me"
+EOF
 }
