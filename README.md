@@ -1,6 +1,10 @@
 # Secure AWS Automation: Zero-Touch User Provisioning
 
-🇯🇵 日本語 | 🇺🇸 [English](./README.en.md)
+🇯🇵 **日本語** | 🇺🇸 [English](./README.en.md)
+
+<h3 align="center">Terraform × Ansible による AWS EC2 セキュアインフラ自動構築</h3>
+
+<div align="center">
 
 ![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white)
 ![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=flat-square&logo=ansible&logoColor=white)
@@ -8,6 +12,8 @@
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat-square&logo=ubuntu&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+
+</div>
 
 ## 📌 概要
 

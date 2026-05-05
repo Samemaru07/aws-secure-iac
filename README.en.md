@@ -1,6 +1,10 @@
 # Secure AWS Automation: Zero-Touch User Provisioning
 
-🇯🇵 [日本語](./README.md) | 🇺🇸 English
+🇯🇵 [日本語](./README.md) | 🇺🇸 **English**
+
+<h3 align="center">Automated Secure Infrastructure Provisioning on AWS EC2 with Terraform & Ansible</h3>
+
+<div align="center">
 
 ![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white)
 ![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=flat-square&logo=ansible&logoColor=white)
@@ -8,6 +12,8 @@
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat-square&logo=ubuntu&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+
+</div>
 
 ## 📌 Overview
 
@@ -74,8 +80,8 @@ aws configure
 ```
 
 3. Required permissions  
-In the IAM console, make sure the user you are using has the `AdministratorAccess` policy attached (or equivalent permissions required by this configuration).
-  </details>
+   In the IAM console, make sure the user you are using has the `AdministratorAccess` policy attached (or equivalent permissions required by this configuration).
+     </details>
 
 - Make sure your SSH public key exists at `~/.ssh/id_ed25519.pub`
 - Make sure your AWS IAM user has permissions equivalent to `AdministratorAccess`
