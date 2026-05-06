@@ -121,6 +121,14 @@ resource "local_file" "ansible_inventory" {
                ansible_host: "${aws_instance.server.public_ip}"
                ansible_user: "${var.ssh_user}"
                main_domain: "${var.main_domain}"
-               test_domain: "${var.test_domain}"
 EOF
+}
+
+# DNS レコードの自動更新
+resource "cloudflare_record" "main" {
+  zone_id = var.cloudflare_zone_id
+  name    = "iac"
+  content = aws_instance.server.public_ip
+  type    = "A"
+  ttl     = 60
 }
