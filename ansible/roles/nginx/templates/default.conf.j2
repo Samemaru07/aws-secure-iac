@@ -1,6 +1,6 @@
 server {
     listen 80;  # 80番 (HTTP) で来た人は...
-    server_name {{ main_domain }} {{ test_domain }};
+    server_name {{ main_domain }};
 
     # Certbotが認証ファイルを起く場所。ここは常にHTTPでアクセス可能にする。
     location /.well-known/acme-challenge/ {
@@ -23,7 +23,7 @@ server {
 {% if cert_stat.stat.exists %}
 server {
     listen 443 ssl;
-    server_name {{ main_domain }} {{ test_domain }};
+    server_name {{ main_domain }};
 
     ssl_certificate /etc/letsencrypt/live/{{ main_domain }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ main_domain }}/privkey.pem;
