@@ -49,7 +49,7 @@
 
 # 6. 証明書がなければ取得する。
 # ansible.builtin.command: サーバ上で直接コマンドを実行するモジュール
-# `--nginx`: Nginxの設定を自動で読み取り、SSLの設定も勝手にしてくれる。
+# `--webroot`: Nginxを止めず、かつ設定ファイルを改変せずに認証する。
 # `-d`: 証明書を取得するドメインを指定。
 # `--non-interactive`: 途中で「はい/いいえ」を聞かれないようにする。
 # `--agree-tos`: 利用規約に同意する。
@@ -57,7 +57,7 @@
 - name: "Issue SSL certificate using Certbot"
   ansible.builtin.command:
       # --stagingで、テスト用の証明書を発行する。
-      cmd: "certbot certonly --nginx -d  {{ main_domain }} -d {{ test_domain }} --non-interactive --agree-tos -m {{ certbot_admin_email }}"
+      cmd: "certbot certonly --webroot -w /var/www/html -d {{ main_domain }} --non-interactive --agree-tos -m {{ certbot_admin_email }}"
   when: "not cert_stat.stat.exists"
 
 # 証明書ができたはずなので、調査員 (stat) を再度送り込む。
