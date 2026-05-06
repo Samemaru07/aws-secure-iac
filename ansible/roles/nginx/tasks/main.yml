@@ -30,8 +30,9 @@
 # 4. コンテンツやサービスの状態を整える。
 - name: "Copy custom index.html"
   ansible.builtin.copy:
-      src: "index.html" #`files/`ディレクトリ内にあるファイル名を指定 (自動的にfiles/を探す)
-      dest: "/var/www/html/index.html" # サーバ上の配置先パス
+      # src: "index.html" #`files/`ディレクトリ内にあるファイル名を指定 (自動的にfiles/を探す)
+      src: "../../../../web/"
+      dest: "/var/www/html/" # サーバ上の配置先パス
       owner: "www-data"
       group: "www-data"
       mode: "0644"
@@ -56,7 +57,7 @@
 - name: "Issue SSL certificate using Certbot"
   ansible.builtin.command:
       # --stagingで、テスト用の証明書を発行する。
-      cmd: "certbot certonly --nginx -d  {{ main_domain }} -d {{ test_domain }} --non-interactive --agree-tos -m {{ certbot_admin_email }} --staging"
+      cmd: "certbot certonly --nginx -d  {{ main_domain }} -d {{ test_domain }} --non-interactive --agree-tos -m {{ certbot_admin_email }}"
   when: "not cert_stat.stat.exists"
 
 # 証明書ができたはずなので、調査員 (stat) を再度送り込む。

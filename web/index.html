@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>samemaru.me | Infrastructure Town</title>
+
+        <meta
+            name="description"
+            content="TerraformとAnsibleによる完全自動構築プロセス (ZTP) の完了を証明する、aws-secure-iacプロジェクトの展開検証用デモページです。"
+        />
+
+        <meta
+            property="og:title"
+            content="aws-secure-iac | Infrastructure Deployment Demo"
+        />
+        <meta
+            property="og:description"
+            content="コードによってプロビジョニングされたインフラの稼働状態を、3Dビジュアライゼーションで確認できます。"
+        />
+        <meta
+            property="og:image"
+            content="https://samemaru.me/assets/og-image.png"
+        />
+
+        <meta
+            name="twitter:title"
+            content="aws-secure-iac | Infrastructure Deployment Demo"
+        />
+        <meta
+            name="twitter:description"
+            content="手動操作を一切排除したゼロ・タッチ・プロビジョニングの実行結果デモ。"
+        />
+
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="icon" href="./assets/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+        <link rel="stylesheet" href="./css/style.css" />
+    </head>
+    <body>
+        <div id="boot-screen"><div id="log-container"></div></div>
+        <div id="top-terminal">
+            <span id="typewriter-text"></span><span class="cursor">_</span>
+        </div>
+        <div id="canvas-container">
+            <canvas id="c"></canvas>
+            <div id="hint">ドラッグで回転 | スクロールでズームイン/アウト</div>
+        </div>
+
+        <div id="content-section">
+            <div class="scroll-indicator">
+                <span>Scroll Down</span>
+                <i class="fa-solid fa-angles-down"></i>
+            </div>
+            <div class="section">
+                <h2>Provisioned by Code.</h2>
+                <p>
+                    このページは、ZTPによって完全自動構築された環境上で動作しています。
+                    手動でのサーバログインを一切行わず、コードのみでインフラ構築からミドルウェアの設定、SSL証明書の自動取得、そしてこのページのデプロイまでを完結させています。
+                </p>
+
+                <h2>Information of this Site</h2>
+                <ul>
+                    <li>
+                        <strong>Terraform</strong>: AWS
+                        EC2インスタンスのプロビジョニングを行う。
+                    </li>
+                    <li>
+                        <strong>Ansible</strong>:
+                        作成されたインスタンスにNginxをセットアップ。
+                    </li>
+                    <li>
+                        <strong>Nginx</strong>:
+                        高速性・安定性・低メモリ消費を特徴とするオープンソースのWebサーバ。
+                    </li>
+                    <li>
+                        <strong>EC2 Instance</strong>:
+                        <ul class="ul-indent">
+                            <li>
+                                &ensp;<strong
+                                    >Instance Type / Instance Size</strong
+                                >: t2.micro
+                            </li>
+                            <li>
+                                &ensp;<strong>OS</strong>: Ubuntu 22.04.5 LTS
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="section profile-section">
+                <div class="profile-info">
+                    <div class="bio">
+                        <h2>Samemaru</h2>
+                        <p>> Aspiring Infrastructure / Network Engineer</p>
+                        <ul>
+                            <li>
+                                <strong>Status</strong>:
+                                石川工業高等専門学校&nbsp; 電子情報工学科 4年
+                            </li>
+                            <li>
+                                <strong>Likes</strong>: Linux, 分割キーボード,
+                                ガンダム
+                            </li>
+                            <li>
+                                <strong>Hobbies</strong>: ガンプラ制作,
+                                アニメ鑑賞
+                            </li>
+                        </ul>
+                    </div>
+
+                    <img
+                        src="./assets/profile.png"
+                        alt="Samemaru Profile"
+                        class="profile-img"
+                    />
+                </div>
+
+                <div class="links">
+                    <a href="https://github.com/Samemaru07" target="_blank">
+                        <i class="fa-brands fa-github"></i> GitHub (Profile)
+                    </a>
+                    <a
+                        href="https://github.com/Samemaru07/aws-secure-iac"
+                        target="_blank"
+                    >
+                        <i class="fa-solid fa-code"></i> Source Code (IaC)
+                    </a>
+                </div>
+            </div>
+            <div class="section profiloe-section"></div>
+            <div class="copyright">
+                &copy; 2026 Samemaru. All Rights Reserved.
+            </div>
+        </div>
+        <script src="./js/main.js"></script>
+    </body>
+</html>
