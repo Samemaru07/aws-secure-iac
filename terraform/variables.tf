@@ -8,7 +8,14 @@ variable "main_domain" {
   description = "Primary domain name"
 }
 
-variable "test_domain" {
+variable "cloudflare_zone_id" {
   type        = string
-  description = "Subdomain for testing purposes"
+  description = "Cloudflare Zone ID"
+  sensitive   = true
+}
+
+variable "cloudflare_api_token" {
+  type        = string
+  description = "Cloudflare API Token"
+  sensitive   = true
 }
