@@ -647,7 +647,7 @@ const LOGS = [
                     back: "#0f172a",
                     left: "#1e293b",
                     right: "#1e293b",
-                    top: "#fbbf24",
+                    top: null,
                     stroke: "#fbbf24"
                 });
 
