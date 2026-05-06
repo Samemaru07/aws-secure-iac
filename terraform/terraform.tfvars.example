@@ -1,0 +1,4 @@
+# Example configuration - Copy this to terraform.tfvars and edit
+ssh_user    = "your_ssh_user"
+main_domain = "example.com"
+test_domain = "sub.example.com"

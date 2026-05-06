@@ -119,8 +119,8 @@ resource "local_file" "ansible_inventory" {
        hosts:
            ec2-instance:
                ansible_host: "${aws_instance.server.public_ip}"
-               ansible_user: "ubuntu"
-               main_domain: "samemaru.me"
-               test_domain: "iac.samemaru.me"
+               ansible_user: "${var.ssh_user}"
+               main_domain: "${var.main_domain}"
+               test_domain: "${var.test_domain}"
 EOF
 }
