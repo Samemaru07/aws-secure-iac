@@ -23,6 +23,8 @@ This project automates everything from AWS EC2 provisioning to middleware setup 
 
 High-level view of the AWS resources provisioned by Terraform:
 
+![aws-architecture](</mnt/c/Users/nakayama/Downloads/aws-secure-iac_architecture.drawio(1).png>)
+
 - **Network**: A single EC2 instance in a public subnet.
 - **Security**: Security group limited to only 22 (SSH), 80 (HTTP), and 443 (HTTPS), following the principle of least privilege.
 - **SSL**: Automatic certificate renewal with Let's Encrypt.
@@ -80,8 +82,8 @@ aws configure
 ```
 
 3. Required permissions  
-   In the IAM console, make sure the user you are using has the `AdministratorAccess` policy attached (or equivalent permissions required by this configuration).
-     </details>
+In the IAM console, make sure the user you are using has the `AdministratorAccess` policy attached (or equivalent permissions required by this configuration).
+   </details>
 
 - Make sure your SSH public key exists at `~/.ssh/id_ed25519.pub`
 - Make sure your AWS IAM user has permissions equivalent to `AdministratorAccess`
@@ -141,16 +143,7 @@ For the EC2 instance created by Terraform, this automates user creation, securit
 cd ../ansible
 ```
 
-2. Remove old host key
-
-If you recreated the instance, the previous fingerprint (host key) may remain locally and cause a connection error.  
-Reset known-host data for the new public IP.
-
-```bash
-ssh-keygen -R <Public_IP>
-```
-
-3. Define personal values with Ansible Vault  
+2. Define personal values with Ansible Vault  
    Run the command and fill in the following 3 fields:
 
 - `initial_user`  
@@ -164,7 +157,7 @@ mkdir vars
 ansible-vault create vars/vault.yml
 ```
 
-4. Run the playbook
+3. Run the playbook
 
 This project uses a two-phase model for stronger security: "initial user bootstrap" and "operations user configuration management."
 
@@ -172,7 +165,7 @@ This project uses a two-phase model for stronger security: "initial user bootstr
 ansible-playbook -i inventory/hosts.yml playbooks/site.yml
 ```
 
-5. What the playbook does
+4. What the playbook does
 
 Running `playbooks/site.yml` applies the following in order:
 
@@ -185,7 +178,7 @@ Running `playbooks/site.yml` applies the following in order:
     - Enable firewall (UFW) with ports 22, 80, and 443 open.
     - Obtain SSL certificate via certbot and apply HTTPS configuration.
 
-6. Verify completion
+5. Verify completion
 
 Open the following URL in your browser and confirm the HTTPS (lock icon) index page is displayed.
 

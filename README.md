@@ -23,6 +23,8 @@ Terraform と Ansible を用いて、AWS EC2 のプロビジョニングから�
 
 Terraformによって構築されるAWSリソースの全体像です。
 
+![aws-architecture](</mnt/c/Users/nakayama/Downloads/aws-secure-iac_architecture.drawio(1).png>)
+
 - **ネットワーク**: Public Subnet 内に配置された単一の EC2 インスタンス。
 - **セキュリティ**: 最小権限の原則に基づき、22 (SSH), 80 (HTTP), 443 (HTTPS) のみに制限されたセキュリティグループ。
 - **SSL**: Let's Encrypt による自動証明書更新。
@@ -141,16 +143,7 @@ Terraform で作成した EC2 インスタンスに対し、ユーザ作成, セ
 cd ../ansible
 ```
 
-2. 古いホストキーの削除
-
-インスタンスを作り直した場合、以前のフィンガープリント (Host Key) がローカルに残っていると接続エラーになる。
-新しいパブリックIPに対して記憶をリセットする。
-
-```bash
-ssh-keygen -R <Public_IP>
-```
-
-3. Ansible Vaultを用いた個人情報の記述
+2. Ansible Vaultを用いた個人情報の記述
    コマンドを実行し、以下の3項目を入力する。
 
 - `initial_user`
@@ -164,7 +157,7 @@ mkdir vars
 ansible-vault create vars/vault.yml
 ```
 
-4. プレイブックの実行
+3. プレイブックの実行
 
 本プロジェクトは、セキュリティ向上のため「初期ユーザでのセットアップ」と「運用ユーザでの構成管理」の2フェーズ構成になっています。
 
@@ -172,7 +165,7 @@ ansible-vault create vars/vault.yml
 ansible-playbook -i inventory/hosts.yml playbooks/site.yml
 ```
 
-5. 実行内容の内訳
+4. 実行内容の内訳
 
 プレイブック (`playbooks/site.yml`) を実行することで、以下のプロセスが順次適用されます。
 
@@ -185,7 +178,7 @@ ansible-playbook -i inventory/hosts.yml playbooks/site.yml
     - ファイアウォール (UFW) の有効化 (22, 80, 443 ポートの開放) 。
     - certbotによるSSL証明書の自動取得とHTTPS設定の反映。
 
-6. 構築完了の確認
+5. 構築完了の確認
 
 ブラウザで以下の URL にアクセスし、HTTPS 化 (鍵マーク) されたインデックスページが表示されることを確認する。
 
