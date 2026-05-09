@@ -33,17 +33,29 @@ A comprehensive overview of the AWS environment built with Terraform and Ansible
 - **SSL / DNS**: DNS management via Cloudflare and automated SSL certificate renewal using Let's Encrypt.
 
 ## 🎬 Demo
+
 This video demonstrates the full "Zero-Touch" provisioning flow—from the initial Terraform command to the automated SSL certificate acquisition.
 
 https://github.com/user-attachments/assets/93c038e3-7685-4ac3-9ad0-38d9c5b2f0b2
 
+## 🌟 Project Highlights
+
+This repository goes beyond simply launching an EC2 server. It is an implementation-focused IaC project designed around **reproducibility, security, and operational reliability**.
+
+- **Zero-touch end-to-end provisioning**: Terraform resource provisioning is tightly integrated with Ansible configuration management, covering inventory generation through Nginx and SSL setup in one automated flow.
+- **Production-minded security model**: Dual-layer protection with AWS Security Groups and UFW, safe privilege handoff to a management user, and bootstrap user disablement are all enforced as code.
+- **Resilient HTTPS automation**: Certificate state is detected to branch initial vs. subsequent behavior, while `certonly` plus template-based config management preserves idempotency and consistency.
+- **Implemented web experience for live verification**: `web/` includes Canvas-based pseudo-3D visualization of VPC/Subnet/IGW/SG/UFW/EC2/Nginx and animates the full request path from DNS lookup to response delivery, making the deployed infrastructure behavior observable in the browser.
+
 ## 🛠️ Tech Stack
 
-- Terraform
-- Ansible
-- Git
-- Cloudflare (DNS)
-- Target OS: Ubuntu (on EC2)
+- **Infrastructure as Code:** Terraform
+- **Configuration Management:** Ansible
+- **Cloud:** AWS EC2
+- **DNS/SSL:** Cloudflare, Certbot (Let's Encrypt)
+- **Target OS:** Ubuntu 22.04 LTS
+- **Middleware:** Nginx
+- **Web site:** JavaScript (Canvas API), HTML5, CSS3
 
 ## 📁 Directory Structure
 
@@ -236,6 +248,13 @@ This project is designed not only for automation but also for practical security
 - **SSH host key mismatch after infrastructure recreation**
     - **Issue**: Recreating instances repeatedly triggered `REMOTE HOST IDENTIFICATION HAS CHANGED`.
     - **Solution**: Integrated `ssh-keygen -R` cleanup into the workflow to improve development efficiency.
+
+## 🚧 Planned Enhancements
+
+- **Stronger CI/CD quality gates**: Automate Terraform fmt/validate/plan and Ansible lint/syntax-check in GitHub Actions so every change passes infrastructure checks before review.
+- **Observability layer**: Add Nginx/OS metrics and log visualization to evaluate post-deploy health not only by page rendering but also by measurable telemetry.
+- **Environment separation and reusability**: Expand toward dev/stg/prod variable separation and Terraform modularization to safely scale the same design across multiple environments.
+- **Improved failure readiness**: Define backup and rollback procedures as code, targeting not only rebuildability but also faster recovery (RTO-conscious operations).
 
 ## 📄 License
 

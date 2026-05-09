@@ -36,13 +36,24 @@ Terraform と Ansible の連携により、セキュリティと自動化を両�
 
 https://github.com/user-attachments/assets/93c038e3-7685-4ac3-9ad0-38d9c5b2f0b2
 
+## 🌟 このプロジェクトの特徴
+
+このリポジトリは「 AWS にサーバを立てる」だけでなく、**再現性・安全性・運用性**まで含めて設計した、実践志向の IaC プロジェクトです。
+
+- **ゼロタッチで完走する構築フロー**: Terraform のリソース作成と Ansible の構成管理を連携させ、インベントリ生成から Nginx/SSL 設定までを一気通貫で自動化。
+- **実運用を意識したセキュリティ設計**: AWS Security Group + UFW の二層防御、初期ユーザの無効化、管理ユーザへの安全な権限移譲までをコードで担保。
+- **壊れにくいHTTPS自動化**: 証明書状態を判定して初回と再実行時の挙動を分岐し、`certonly` + テンプレート管理で冪等性と設定の一貫性を維持。
+- **実装したWebページで可視化まで実施**: `web/` では Canvas ベースの3D表現で VPC / Subnet / IGW / SG / UFW / EC2 / Nginx を描画し、DNS問い合わせからレスポンス返却までの通信フローをアニメーションで確認可能。デプロイ済み環境が「本当に動いている」ことを見える形で示します。
+
 ## 🛠️ 技術スタック
 
-- Terraform
-- Ansible
-- Git
-- Cloudflare (DNS)
-- Target OS: Ubuntu (on EC2)
+- **Infrastructure as Code:** Terraform
+- **Configuration Management:** Ansible
+- **Cloud:** AWS EC2
+- **DNS/SSL:** Cloudflare, Certbot (Let's Encrypt)
+- **Target OS:** Ubuntu 22.04 LTS
+- **Middleware:** Nginx
+- **Web site:** JavaScript (Canvas API), HTML5, CSS3
 
 ## 📁 ディレクトリ構造
 
@@ -236,6 +247,13 @@ terraform destroy
 - **インフラ再構築時のSSHホストキー不一致**
     - **課題**: インスタンスを作り直すたびに「REMOTE HOST IDENTIFICATION HAS CHANGED」エラーが発生。
     - **解決**: `ssh-keygen -R` による既知のホスト情報の削除をフローに組み込み、開発効率を改善。
+
+## 🚧 今後の実装予定
+
+- **CI/CDパイプラインの強化**: Terraform fmt/validate/plan, Ansible lint/syntax-check を GitHub Actions で自動化し、レビュー前に品質ゲートを通過させる。
+- **観測性 (Observability) の追加**: Nginx/OS メトリクスとログ可視化を導入し、デプロイ後の状態確認を「画面表示」だけでなく数値とログでも判断可能にする。
+- **環境分離と再利用性の向上**: dev/stg/prod の変数分離と Terraform モジュール化を進め、同一設計を安全に横展開できる構成へ発展させる。
+- **障害対応力の向上**: バックアップ方針とロールバック手順をコード化し、再構築だけでなく復旧時間短縮 (RTO意識) まで含めた運用設計にする。
 
 ## 📄 ライセンス
 
