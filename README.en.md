@@ -33,6 +33,9 @@ A comprehensive overview of the AWS environment built with Terraform and Ansible
 - **SSL / DNS**: DNS management via Cloudflare and automated SSL certificate renewal using Let's Encrypt.
 
 ## 🎬 Demo
+This video demonstrates the full "Zero-Touch" provisioning flow—from the initial Terraform command to the automated SSL certificate acquisition.
+
+https://github.com/user-attachments/assets/93c038e3-7685-4ac3-9ad0-38d9c5b2f0b2
 
 ## 🛠️ Tech Stack
 
