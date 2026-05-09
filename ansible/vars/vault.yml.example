@@ -1,0 +1,4 @@
+# Example configuration - Copy this to vault.yml and edit
+ssh_user: "your_ssh_user"
+manage_user: "your_manage_user"
+certbot_admin_email: "your_email@example.com"

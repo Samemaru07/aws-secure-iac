@@ -6,56 +6,82 @@
 
 <div align="center">
 
-![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white)
-![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=flat-square&logo=ansible&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white)
-![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat-square&logo=ubuntu&logoColor=white)
-![Nginx](https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+![Terraform](https://img.shields.io/badge/-Terraform-844FBA.svg?logo=terraform&logoColor=white&style=flat)
+![Ansible](https://img.shields.io/badge/-Ansible-EE0000.svg?logo=ansible&logoColor=white&style=flat)
+![AWS](https://img.shields.io/badge/-AWS-232F3E.svg?logo=amazonwebservices&logoColor=white&style=flat)
+![Cloudflare](https://img.shields.io/badge/-Cloudflare-F38020.svg?logo=cloudflare&logoColor=white&style=flat)
+![Ubuntu](https://img.shields.io/badge/-Ubuntu-E95420.svg?logo=ubuntu&logoColor=white&style=flat)
+![Nginx](https://img.shields.io/badge/-Nginx-009639.svg?logo=nginx&logoColor=white&style=flat)
+![License](https://img.shields.io/badge/-License-blue.svg?style=flat)
 
 </div>
 
 ## 📌 Overview
 
-This project automates everything from AWS EC2 provisioning to middleware setup (such as Nginx) using Terraform and Ansible.
+This project automates the entire workflow from AWS EC2 provisioning to middleware (Nginx) setup using Terraform and Ansible.
+Check out the live site here! → [Infrastructure Town](https://iac.samemaru.me)
 
 ## 🏗️ Architecture
 
-High-level view of the AWS resources provisioned by Terraform:
+A comprehensive overview of the AWS environment built with Terraform and Ansible, designed to balance high security with full automation.
 
-- **Network**: A single EC2 instance in a public subnet.
-- **Security**: Security group limited to only 22 (SSH), 80 (HTTP), and 443 (HTTPS), following the principle of least privilege.
-- **SSL**: Automatic certificate renewal with Let's Encrypt.
+![aws-architecture](./imgs/architecture.png)
+
+- **Network**: A single EC2 instance `(t2.micro)` deployed within a public subnet.
+- **Security**: Dual-layer defense combining AWS (Security Groups) and OS-level (UFW) firewalls. Traffic is strictly limited to ports 22 (SSH), 80 (HTTP), and 443 (HTTPS).
+- **Automation**: Seamless **"Zero-Touch" provisioning** achieved by Terraform dynamically generating inventory files for Ansible, eliminating manual intervention.
+- **SSL / DNS**: DNS management via Cloudflare and automated SSL certificate renewal using Let's Encrypt.
 
 ## 🎬 Demo
 
+This video demonstrates the full "Zero-Touch" provisioning flow—from the initial Terraform command to the automated SSL certificate acquisition.
+
+https://github.com/user-attachments/assets/93c038e3-7685-4ac3-9ad0-38d9c5b2f0b2
+
+## 🌟 Project Highlights
+
+This repository goes beyond simply launching an EC2 server. It is an implementation-focused IaC project designed around **reproducibility, security, and operational reliability**.
+
+- **Zero-touch end-to-end provisioning**: Terraform resource provisioning is tightly integrated with Ansible configuration management, covering inventory generation through Nginx and SSL setup in one automated flow.
+- **Production-minded security model**: Dual-layer protection with AWS Security Groups and UFW, safe privilege handoff to a management user, and bootstrap user disablement are all enforced as code.
+- **Resilient HTTPS automation**: Certificate state is detected to branch initial vs. subsequent behavior, while `certonly` plus template-based config management preserves idempotency and consistency.
+- **Implemented web experience for live verification**: `web/` includes Canvas-based pseudo-3D visualization of VPC/Subnet/IGW/SG/UFW/EC2/Nginx and animates the full request path from DNS lookup to response delivery, making the deployed infrastructure behavior observable in the browser.
+
 ## 🛠️ Tech Stack
 
-- Terraform
-- Ansible
-- Git
-- Target OS: Ubuntu (on EC2)
+- **Infrastructure as Code:** Terraform
+- **Configuration Management:** Ansible
+- **Cloud:** AWS EC2
+- **DNS/SSL:** Cloudflare, Certbot (Let's Encrypt)
+- **Target OS:** Ubuntu 22.04 LTS
+- **Middleware:** Nginx
+- **Web site:** JavaScript (Canvas API), HTML5, CSS3
 
 ## 📁 Directory Structure
 
 ```text
 .
-├── terraform/                      # Infrastructure (AWS resources)
-│   ├── main.tf                     # Main logic (resource definitions, inventory generation)
-│   ├── variables.tf                # Variable definitions (interface)
-│   ├── terraform.tfvars            # Environment-specific values (excluded from Git)
-│   └── terraform.tfvars.example    # Template for configuration values
-└── ansible/                        # Configuration management (middleware setup)
-    ├── ansible.cfg                 # Base Ansible settings
-    ├── inventory/
-    │   └── hosts.yml               # Inventory dynamically generated by Terraform
-    ├── playbooks/
-    │   └── site.yml                # Top-level orchestration playbook
-    ├── roles/                      # Role-based separation by responsibility
-    │   ├── common/                 # User creation and baseline security settings
-    │   └── nginx/                  # Nginx setup and SSL certificate acquisition
-    └── vars/
-        └── vault.yml               # Encrypted variables via Ansible Vault (excluded from Git)
+├ terraform/                      # Infrastructure (AWS resources)
+│   ├ main.tf                     # Main logic (resource definitions, inventory generation)
+│   ├ variables.tf                # Variable definitions (interface)
+│   ├ terraform.tfvars            # Environment-specific values (excluded from Git)
+│   └ terraform.tfvars.example    # Template for configuration values
+├ ansible/                        # Configuration management (middleware setup)
+│   ├ ansible.cfg                 # Base Ansible settings
+│   ├ inventory/
+│   │   └ hosts.yml               # Inventory dynamically generated by Terraform
+│   ├ playbooks/
+│   │   └ site.yml                # Top-level orchestration playbook
+│   ├ roles/                      # Role-based separation by responsibility
+│   │   ├ common/                 # User creation and baseline security settings
+│   │   └ nginx/                  # Nginx setup and SSL certificate acquisition
+│   └ vars/
+│       └ vault.yml               # Encrypted variables via Ansible Vault (excluded from Git)
+└ web/                            # Web content to be deployed
+    ├ index.html                  # Main entry point
+    ├ css/                        # Stylesheets
+    ├ js/                         # JavaScript files
+    └ assets/                     # Images and other resources
 ```
 
 ## 🚀 Usage
@@ -70,18 +96,20 @@ High-level view of the AWS resources provisioned by Terraform:
 <details>
 <summary>AWS CLI setup steps</summary>
 
-1. Installation  
-   Follow the [official guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
-2. Configure credentials
+**1. Installation**  
+ Follow the [official guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
+
+**2. Configure credentials**
 
 ```bash
 aws configure
 # Enter Access Key ID, Secret Access Key, and Region
 ```
 
-3. Required permissions  
-   In the IAM console, make sure the user you are using has the `AdministratorAccess` policy attached (or equivalent permissions required by this configuration).
-     </details>
+**3. Required permissions**  
+ In the IAM console, make sure the user you are using has the `AdministratorAccess` policy attached (or equivalent permissions required by this configuration).
+
+</details>
 
 - Make sure your SSH public key exists at `~/.ssh/id_ed25519.pub`
 - Make sure your AWS IAM user has permissions equivalent to `AdministratorAccess`
@@ -90,42 +118,42 @@ aws configure
 
 Create VPC, subnet, internet gateway, route table, security group, and EC2 instance.
 
-1. Move to the directory
+**1. Move to the directory**
 
 ```bash
 cd terraform
 ```
 
-2. Prepare configuration file
+**2. Prepare configuration file**
 
 Create `terraform.tfvars` based on `terraform/terraform.tfvars.example`, then set your domain name and SSH username.
 
-3. Initialize
+**3. Initialize**
 
 ```bash
 terraform init
 ```
 
-4. Review execution plan
+**4. Review execution plan**
 
 ```bash
 terraform plan
 ```
 
-5. Apply
+**5. Apply**
 
 ```bash
 terraform apply
 ```
 
-6. Auto-generate/update Ansible inventory
+**6. Auto-generate/update Ansible inventory**
 
 ```text
 ansible/inventory/hosts.yml
 ```
 
-7. Verify SSH connectivity  
-   Confirm that you can SSH into the created server.
+**7. Verify SSH connectivity**  
+ Confirm that you can SSH into the created server.
 
 ```bash
 ssh -i ~/.ssh/id_ed25519 <ssh_user set in terraform.tfvars>@<Public_IP>
@@ -135,36 +163,30 @@ ssh -i ~/.ssh/id_ed25519 <ssh_user set in terraform.tfvars>@<Public_IP>
 
 For the EC2 instance created by Terraform, this automates user creation, security hardening, Nginx setup, and SSL certificate issuance.
 
-1. Move to the directory
+**1. Move to the directory**
 
 ```bash
 cd ../ansible
 ```
 
-2. Remove old host key
+**2. Configuring Secrets with Ansible Vault**
+A template for secret variables used by Ansible is provided.
 
-If you recreated the instance, the previous fingerprint (host key) may remain locally and cause a connection error.  
-Reset known-host data for the new public IP.
-
-```bash
-ssh-keygen -R <Public_IP>
-```
-
-3. Define personal values with Ansible Vault  
-   Run the command and fill in the following 3 fields:
-
-- `initial_user`  
-  Username used immediately after instance creation.
-- `manage_user`  
-  Username used after SSH restrictions are applied.
-- `cert_admin_email`
+- **Step 1: Copy the template:**
 
 ```bash
-mkdir vars
-ansible-vault create vars/vault.yml
+cp vars/vault.yml.example vars/vault.yml
 ```
 
-4. Run the playbook
+- **Step 2: Edit `vars/vault.yml` and enter the required values.**
+
+- **Step 3: Encrypt the file:**
+
+```bash
+ansible-vault encrypt vars/vault.yml
+```
+
+**3. Run the playbook**
 
 This project uses a two-phase model for stronger security: "initial user bootstrap" and "operations user configuration management."
 
@@ -172,20 +194,20 @@ This project uses a two-phase model for stronger security: "initial user bootstr
 ansible-playbook -i inventory/hosts.yml playbooks/site.yml
 ```
 
-5. What the playbook does
+**4. What the playbook does**
 
 Running `playbooks/site.yml` applies the following in order:
 
-- Phase 1: Bootstrap
+- **Phase 1**: Bootstrap
     - Create the management user and grant sudo privileges.
     - Configure public key authentication.
     - Disable login for the default user (`nologin`) and enforce SSH access restrictions.
-- Phase 2: Main Setup
+- **Phase 2**: Main Setup
     - Install and configure Nginx.
     - Enable firewall (UFW) with ports 22, 80, and 443 open.
     - Obtain SSL certificate via certbot and apply HTTPS configuration.
 
-6. Verify completion
+**5. Verify completion**
 
 Open the following URL in your browser and confirm the HTTPS (lock icon) index page is displayed.
 
@@ -227,6 +249,21 @@ This project is designed not only for automation but also for practical security
     - **Issue**: Recreating instances repeatedly triggered `REMOTE HOST IDENTIFICATION HAS CHANGED`.
     - **Solution**: Integrated `ssh-keygen -R` cleanup into the workflow to improve development efficiency.
 
+## 🚧 Planned Enhancements
+
+- **Stronger CI/CD quality gates**: Automate Terraform fmt/validate/plan and Ansible lint/syntax-check in GitHub Actions so every change passes infrastructure checks before review.
+- **Observability layer**: Add Nginx/OS metrics and log visualization to evaluate post-deploy health not only by page rendering but also by measurable telemetry.
+- **Environment separation and reusability**: Expand toward dev/stg/prod variable separation and Terraform modularization to safely scale the same design across multiple environments.
+- **Improved failure readiness**: Define backup and rollback procedures as code, targeting not only rebuildability but also faster recovery (RTO-conscious operations).
+
 ## 📄 License
 
 This project is released under the [MIT License](./LICENSE).
+
+### 📜 License Credits
+
+Links to the tools and logo assets used in the [Architecture](#-architecture) section.
+
+- [draw.io](https://app.diagrams.net/)
+- **Nginx**, **Terraform**: [ICONS8](https://icons8.jp/icon/t2x6DtCn5Zzx/nginx)
+- **Cloudflare**: [KawaiiLogos by SAWARATSUKI](https://github.com/SAWARATSUKI/KawaiiLogos/blob/main/Cloudflare/png/Cloudflare.png)
