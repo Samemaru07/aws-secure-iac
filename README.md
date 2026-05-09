@@ -34,7 +34,7 @@ Terraform と Ansible の連携により、セキュリティと自動化を両�
 
 ## 🎬 デモ
 
-![demo]{./imgs/aws-secure-iac_demo.mp4}
+https://github.com/user-attachments/assets/93c038e3-7685-4ac3-9ad0-38d9c5b2f0b2
 
 ## 🛠️ 技術スタック
 
