@@ -1,0 +1,25 @@
+---
+# プレイブック1: initial_userとして入り、samemaruを作る。
+- name: "Phase 1: Bootstrap manage_user"
+  hosts: "all"
+  become: true # 管理者権限で実行せよ という意味。
+  vars_files:
+      - "../vars/vault.yml"
+  remote_user: "{{ initial_user }}"
+  tasks:
+      - name: "Ensure samemaru user exists"
+        # manage_user作成&公開鍵設置
+        import_role:
+            name: "common"
+            tasks_from: "create_user.yml"
+
+# プレイブック2: manage_userとして入り直し、本番設定を行う。
+- name: "Phase 2: Configure system as manage_user"
+  hosts: "all"
+  become: true
+  vars_files:
+      - "../vars/vault.yml"
+  remote_user: "{{ manage_user }}"
+  roles:
+      - "common"
+      - "nginx"

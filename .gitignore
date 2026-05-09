@@ -7,3 +7,4 @@ ansible/inventory/hosts.yml
 *.retry
 .DS_Store
 *.swp
+ansible/vars/vault.yml
